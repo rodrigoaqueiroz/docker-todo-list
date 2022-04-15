@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+      
+  todobackend:
+    build: ./todo-app/back-end
+    image: todobackend
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - 3001
+    networks:
+      - todo-app-network
+
+  todofrontend:
+    build: ./todo-app/front-end
+    image: todofrontend
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - 3000
+    environment:
+      - REACT_APP_API_HOST=todobackend
+    depends_on:
+      - "todobackend"
+    networks:
+      - todo-app-network
+
+  todotests:
+    build: ./todo-app/tests
+    image: todotests
+    restart: always
+    volumes:
+      - .:/app
+    environment:
+      - FRONT_HOST=todofrontend
+    depends_on:
+      - "todobackend"
+      - "todofrontend"
+    networks:
+      - todo-app-network
+
+networks:
+   todo-app-network:
+    driver: bridge
